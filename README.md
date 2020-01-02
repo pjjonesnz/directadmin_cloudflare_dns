@@ -32,7 +32,7 @@ PLEASE NOTE: this is a beta script released under the MIT License. While I use i
         <li>su cp -r /home/admin/cloudflare_dns/* /usr/local/directadmin/scripts/custom/</li>
     </ul>
   </li>
-</o>
+</ol>
 
 <h2>Cloudflare setup</h2>
 
