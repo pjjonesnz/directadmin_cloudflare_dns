@@ -28,7 +28,7 @@ PLEASE NOTE: this is a beta script released under the MIT License. While I use i
   <li>Copy all the files in the main folder you created, including all subfolders, to /usr/local/directadmin/scripts/custom
     <ul>
         <li>Using the example folder structure given above, run the following</li>
-        <li>su cp -r /home/admin/directadmin_cloudflare_dns/* /usr/local/directadmin/scripts/custom/</li>
+        <li>sudo cp -r /home/admin/directadmin_cloudflare_dns/* /usr/local/directadmin/scripts/custom/</li>
     </ul>
   </li>
 </ol>
@@ -51,7 +51,7 @@ PLEASE NOTE: this is a beta script released under the MIT License. While I use i
  
  <ol>
   <li>Edit the dns_write_post.sh file to add your email and API Key</li>
-  <li>su vim /usr/local/directadmin/scripts/custom/dns_write_post.sh</li>
+  <li>sudo vim /usr/local/directadmin/scripts/custom/dns_write_post.sh</li>
   <li>Edit the script to add your Cloudflare registered email address: eg. $cloudflare_email = 'email@domain.com';</li>
   <li>Edit the script to add your Cloudflare API Key: eg. $cloudflare_api_key='1234567890';</li>
   <li>Save the script and exit the editor</li>
