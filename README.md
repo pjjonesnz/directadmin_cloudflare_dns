@@ -55,6 +55,7 @@ PLEASE NOTE: this is a beta script released under the MIT License. While I use i
   <li>Edit the script to add your Cloudflare registered email address: eg. $cloudflare_email = 'email@domain.com';</li>
   <li>Edit the script to add your Cloudflare API Key: eg. $cloudflare_api_key='1234567890';</li>
   <li>Save the script and exit the editor</li>
+  <li>Give dns_write_post.sh executable permissions: chmod 755 /usr/local/directadmin/scripts/custom/dns_write_post.sh</li>
   <li>Run the following command to verify the connection to Cloudflare
     <ul>
       <li>/usr/local/directadmin/scripts/custom/dns_write_post.sh verify</li>
