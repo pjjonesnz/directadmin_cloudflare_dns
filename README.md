@@ -59,10 +59,10 @@ PLEASE NOTE: this is a beta script released under the MIT License. While I use i
   <li>Run the following command to verify the connection to Cloudflare
     <ul>
       <li>/usr/local/directadmin/scripts/custom/dns_write_post.sh verify</li>
-      <li>You should see the following message</li>
+      <li>You should see the following message, "Your user ID is: ......", with your user ID listed.</li>
     </ul>
   </li>
-  <li>If so, congratulations, the script is installed and communicating with your Cloudflare account</li>
+  <li>If so, CONGRATULATIONS, the script is installed and communicating with your Cloudflare account</li>
  </ol>
  
  <h2>DirectAdmin setup</h2>
