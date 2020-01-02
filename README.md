@@ -1,2 +1,72 @@
 # directadmin_cloudflare_dns
-Script to sync DirectAdmin dns changes with a Cloudflare account
+Script to sync DirectAdmin dns changes with your Cloudflare account
+
+This handy script syncs the DNS for your domains created and edited in DirectAdmin with your Cloudflare account. Use this when using Cloudflare as your domain nameserver. Cloudflare has a free domain nameserver service which is super fast. It is a great way to move the nameserver off your web server and on to a managed platform.
+
+<h2>Installation (with helpful examples)</h2>
+
+<ol>
+  <li>SSH into your server (as admin)</li>
+  <li>Download the repository to a folder on your server (example as follows)
+    <ul>
+      <li>mkdir /home/admin/cloudflare_dns</li>
+      <li>cd /home/admin/cloudflare_dns</li>
+      <li>git clone https://github.com/pjjonesnz/directadmin_cloudflare_dns.git</li>
+    </ul>
+  </li>
+  <li>Install the required composer packages
+    <ul>
+      <li>cd da_cloudflare_dns_sync<li>
+      <li>Install Composer Dependency Manager for PHP if not already installed on your system (see: https://getcomposer.org/)</li>
+      <li>run 'php composer.phar install' (or possibly 'composer install' if you have composer set up already)</li>
+    </ul>
+  </li>
+  <li>At this point the composer dependencies will be downloaded into the vendor subfolder by composer and everything is ready to move into place in the DirectAdmin custom scripts folder</li>
+  <li>Copy all the files in the main folder you created, including all subfolders, to /usr/local/directadmin/scripts/custom
+    <ul>
+        <li>Using the example folder structure given above, run the following</li>
+        <li>su cp -r /home/admin/cloudflare_dns/* /usr/local/directadmin/scripts/custom/</li>
+    </ul>
+  </li>
+</o>
+
+<h2>Cloudflare setup</h2>
+
+<ol>
+  <li>Create a Cloudflare account if you haven't done so already at cloudflare.com</li>
+  <li>Login to your Cloudflare account</li>
+  <li>If you haven't used Cloudflare before, you will need to add one of your domains to Cloudflare to see the custom nameservers that have been assigned to your account. You're welcome to get a pro plan, but the free plan also works for this step.</li>
+  <li>Once you have added your domain, you'll see the two nameservers that have been assigned to you in the format name.ns.cloudflare.com - make note of these for the DirectAdmin setup below</li>
+  <li>Click on your profile icon at the top right of the website</li>
+  <li>Click on 'My Profile'</li>
+  <li>Select the 'API Tokens' tab</li>
+  <li>Under the API Keys section, click on 'View' next to 'Global API Key'</li>
+  <li>Type your password to view your API Key - make a safe note of this for the script setup below</li>
+ </ol>
+ 
+ <h2>Script setup</h2>
+ 
+ <ol>
+  <li>Edit the dns_write_post.sh file to add your email and API Key</li>
+  <li>su vim /usr/local/directadmin/scripts/custom/dns_write_post.sh</li>
+  <li>Edit the script to add your Cloudflare registered email address: eg. $cloudflare_email = 'email@domain.com';</li>
+  <li>Edit the script to add your Cloudflare API Key: eg. $cloudflare_api_key='1234567890';</li>
+  <li>Save the script and exit the editor</li>
+  <li>Run the following command to verify the connection to Cloudflare
+    <ul>
+      <li>/usr/local/directadmin/scripts/custom/dns_write_post.sh verify</li>
+      <li>You should see the following message</li>
+    </ul>
+  </li>
+  <li>If so, congratulations, the script is installed and communicating with your Cloudflare account</li>
+ </ol>
+ 
+ <h2>DirectAdmin setup</h2>
+ <ol>
+  <li>Login to your DirectAdmin reseller or admin account</li>
+  <li>Edit the DNS record for one of your websites. Change the nameservers to your two new Cloudflare nameservers<li>
+  <li>Have a look at the DNS record on your Cloudflare account - if it is a different domain than you have previously added to your Cloudflare account, you will see that it has now been added, and any differences in the DNS record have been synchronized.</li>
+  <li>Obviously if you are moving to Cloudflare's DNS hosting, you will need to update the nameserver records at your domain registrar.</li>
+  </ol>
+  
+  <strong>That's it!</strong>
