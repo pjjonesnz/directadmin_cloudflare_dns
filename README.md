@@ -13,9 +13,9 @@ PLEASE NOTE: this is a beta script released under the MIT License. While I use i
   <li>SSH into your server (as admin)</li>
   <li>Download the repository to a folder on your server (example as follows)
     <ul>
-      <li>mkdir /home/admin/cloudflare_dns</li>
-      <li>cd /home/admin/cloudflare_dns</li>
+      <li>cd /home/admin</li>
       <li>git clone https://github.com/pjjonesnz/directadmin_cloudflare_dns.git</li>
+      <li>cd directadmin_cloudflare_dns</li>
     </ul>
   </li>
   <li>Install the required composer packages
@@ -29,7 +29,7 @@ PLEASE NOTE: this is a beta script released under the MIT License. While I use i
   <li>Copy all the files in the main folder you created, including all subfolders, to /usr/local/directadmin/scripts/custom
     <ul>
         <li>Using the example folder structure given above, run the following</li>
-        <li>su cp -r /home/admin/cloudflare_dns/* /usr/local/directadmin/scripts/custom/</li>
+        <li>su cp -r /home/admin/directadmin_cloudflare_dns/* /usr/local/directadmin/scripts/custom/</li>
     </ul>
   </li>
 </ol>
