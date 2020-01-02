@@ -20,7 +20,7 @@ PLEASE NOTE: this is a beta script released under the MIT License. While I use i
   </li>
   <li>Install the required composer packages
     <ul>
-      <li>cd da_cloudflare_dns_sync<li>
+      <li>cd da_cloudflare_dns_sync</li>
       <li>Install Composer Dependency Manager for PHP if not already installed on your system (see: https://getcomposer.org/)</li>
       <li>run 'php composer.phar install' (or possibly 'composer install' if you have composer set up already)</li>
     </ul>
