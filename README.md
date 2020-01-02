@@ -68,7 +68,7 @@ PLEASE NOTE: this is a beta script released under the MIT License. While I use i
  <h2>DirectAdmin setup</h2>
  <ol>
   <li>Login to your DirectAdmin reseller or admin account</li>
-  <li>Edit the DNS record for one of your websites. Change the nameservers for the domain to your two new Cloudflare nameservers</li>
+  <li>Edit the DNS record for one of your websites. Change the nameserver records for the domain to your two new Cloudflare nameservers</li>
   <li>Have a look at the DNS record on your Cloudflare account - if it is a different domain than you have previously added to your Cloudflare account, you will see that it has now been added, and any differences in the DNS record have been synchronized.</li>
   <li>Obviously if you are moving to Cloudflare's DNS hosting, you will need to update the nameserver records at your domain registrar.</li>
   </ol>
