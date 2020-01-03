@@ -1,4 +1,4 @@
-# directadmin_cloudflare_dns
+# DirectAdmin to Cloudflare DNS sync
 Script to sync DirectAdmin dns changes with your Cloudflare account
 
 Cloudflare has a free domain nameserver service which is super fast. It is a great way to move nameserver hosting off your web server and on to a managed platform.
