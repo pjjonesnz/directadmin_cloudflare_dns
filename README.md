@@ -74,3 +74,9 @@ PLEASE NOTE: this is a beta script released under the MIT License. While I use i
   </ol>
   
   <strong>That's it!</strong>
+<hr />
+<h3>Notes:</h3>
+<ul>
+  <li>The script is written in PHP and may need the first line changed to point to your PHP installation if your server has a different setup.</li>
+  <li>The TTL for your DNS records is not syncronized across to Cloudflare, they will instead use the Cloudflare defaults for TTL.</li>
+</ul>
