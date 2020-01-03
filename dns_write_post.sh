@@ -23,11 +23,8 @@ if(in_array('verify', $argv)) {
 
 // Check to see if cloudfare is set as the name server for this domain
 $ns1 = getenv('NS1');
-if (strpos($ns1, 'ns.cloudflare.com') === false) {
-    logMessage("Exit: domain DNS not set to Cloudflare");
-    exit;
+if (strpos($ns1, 'ns.cloudflare.com') === true) {
+    require('da_cloudflare_dns_sync/dns_write_post_cloudflare.php');
 }
-
-require('da_cloudflare_dns_sync/dns_write_post_cloudflare.php');
 
 ?>
