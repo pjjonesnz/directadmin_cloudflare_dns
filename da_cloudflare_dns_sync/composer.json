@@ -1,5 +1,11 @@
 {
     "require": {
-        "cloudflare/sdk": "^1.1"
-    }
+        "cloudflare/sdk": "dev-pjjonesnz-fix-mx-priority-0"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/pjjonesnz/cloudflare-php"
+        }
+    ]
 }
