@@ -27,14 +27,19 @@ $txt = getenv('TXT');
 $spf = getenv('SPF');
 $aaaa = getenv('AAAA');
 $srv = getenv('SRV');
-$aTTL = getenv('A_TIME');
-$txtTTL = getenv('TXT_TIME');
-$mxTTL = getenv('MX_TIME');
-$cnameTTL = getenv('CNAME_TIME');
-$ptrTTL = getenv('PTR_TIME');
-$nsTTL = getenv('NS_TIME');
-$aaaaTTL = getenv('AAAA_TIME');
-$srvTTL = getenv('SRV_TIME');
+
+if (!isset($use_da_ttl)) {
+    $use_da_ttl = false;
+}
+
+$aTTL = $use_da_ttl ? getenv('A_TIME') : 0;
+$txtTTL = $use_da_ttl ? getenv('TXT_TIME') : 0;
+$mxTTL = $use_da_ttl ? getenv('MX_TIME') : 0;
+$cnameTTL = $use_da_ttl ? getenv('CNAME_TIME') : 0;
+$ptrTTL = $use_da_ttl ? getenv('PTR_TIME') : 0;
+$nsTTL = $use_da_ttl ? getenv('NS_TIME') : 0;
+$aaaaTTL = $use_da_ttl ? getenv('AAAA_TIME') : 0;
+$srvTTL = $use_da_ttl ? getenv('SRV_TIME') : 0;
 
 // $serial = getenv('SERIAL');
 // $srv_email = getenv('EMAIL');
@@ -314,6 +319,7 @@ function logMessage($message, $error = false)
  */
 function doesRecordExist($records, $record)
 {
+    global $use_da_ttl;
     if (count($records) == 0) {
         return false;
     }
@@ -327,7 +333,7 @@ function doesRecordExist($records, $record)
             if (
                 compare_records($compare->type, $record->type) &&
                 compare_records($compare->name, $record->name) &&
-                compare_records($compare->ttl, $record->ttl) &&
+                (!$use_da_ttl || compare_records($compare->ttl, $record->ttl)) &&
                 compare_records($compare_data->weight, $record_data->weight) &&
                 compare_records($compare_data->target, $record_data->target) &&
                 compare_records($compare_data->proto, $record_data->proto) &&
@@ -342,7 +348,7 @@ function doesRecordExist($records, $record)
                 compare_records($compare->type, $record->type) &&
                 compare_records($compare->name, $record->name) &&
                 compare_records($compare->content, $record->content) &&
-                compare_records($compare->ttl, $record->ttl)
+                (!$use_da_ttl || compare_records($compare->ttl, $record->ttl))
             ) {
                 if ($record->type == 'MX' && !compare_records($compare->priority, $record->priority)) {
                     continue;

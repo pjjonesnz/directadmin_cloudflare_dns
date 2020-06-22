@@ -19,6 +19,13 @@ $cloudflare_email = '';
 $cloudflare_api_key = '';
 
 /**
+ * Use the TTL settings defined by DirectAdmin
+ *
+ * If set to false the default Cloudflare TTL setting will be used (which is currently set by Cloudflare to 300)
+ */
+$use_da_ttl = false;
+
+/**
  * Logging options to sort out any problems
  */
 $log_messages = false;
