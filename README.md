@@ -78,5 +78,5 @@ I use this script in a production environment hosting multiple domains. It was i
 <h3>Notes:</h3>
 <ul>
   <li>The script is written in PHP and may need the first line changed to point to your PHP installation if your server has a different setup.</li>
-  <li>The default TTL settings for your records are managed by Cloudflare by default. If you want to write the DirectAdmin defaults across to CloudFlare, set the $use_da_ttl variable to true. Note that custom TTL for individual records is not supported by DirectAdmin for dns_write_post scripts. Instead you can set the TTL for record types in the DirectAdmin named settings. See this document: https://www.directadmin.com/features.php?id=2084</li>
+  <li>The TTL settings for your records are managed by Cloudflare by default. If you want to write the DirectAdmin defaults across to CloudFlare, set the $use_da_ttl variable to true. Note that custom TTL for individual records are not supported by DirectAdmin using dns_write_post scripts. Instead you can set the TTL for record types in the DirectAdmin named settings. See this document: https://www.directadmin.com/features.php?id=2084</li>
 </ul>
