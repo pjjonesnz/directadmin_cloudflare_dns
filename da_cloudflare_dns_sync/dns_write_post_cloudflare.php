@@ -80,7 +80,7 @@ logMessage('Zone ID for ' . $domain . ' - ' . $zoneID);
  */
 $dns = new \Cloudflare\API\Endpoints\DNS($adapter);
 $page = 0;
-$per_page = 20;
+$per_page = 500;
 $existingRecords = array();
 
 do {
