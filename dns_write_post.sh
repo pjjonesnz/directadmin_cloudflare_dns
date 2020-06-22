@@ -6,7 +6,7 @@
  * Script to synchronize DirectAdmin DNS settings with your Cloudflare hosted ns
  * 
  * @author Paul Jones (info@beyondthebox.co.nz)
- * @version 1.1.6
+ * @version 1.1.7
  * @license MIT
  * @link https://github.com/pjjonesnz/directadmin_cloudflare_dns
  * 

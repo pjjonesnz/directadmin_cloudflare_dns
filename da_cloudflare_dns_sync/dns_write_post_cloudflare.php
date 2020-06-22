@@ -79,7 +79,15 @@ logMessage('Zone ID for ' . $domain . ' - ' . $zoneID);
  * Load existing DNS records for the domain
  */
 $dns = new \Cloudflare\API\Endpoints\DNS($adapter);
-$existingRecords = $dns->listRecords($zoneID)->result;
+$page = 0;
+$per_page = 20;
+$existingRecords = array();
+
+do {
+    $page++;
+    $listRecords = $dns->listRecords($zoneID,'','','',$page,$per_page);
+    $existingRecords = array_merge($existingRecords, $listRecords->result);
+} while($listRecords->result_info->total_pages > $page);
 
 /**
  * Array of dns records to add to Cloudflare
