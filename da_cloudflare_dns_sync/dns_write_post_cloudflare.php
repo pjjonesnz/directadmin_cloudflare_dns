@@ -1,8 +1,9 @@
 <?php
 
 /**
- * Load Cloudflare PHP API
+ * DirectAdmin DNS to Cloudflare sync
  */
+
 require_once('vendor/autoload.php');
 $key = new \Cloudflare\API\Auth\APIKey($cloudflare_email, $cloudflare_api_key);
 $adapter = new Cloudflare\API\Adapter\Guzzle($key);
@@ -12,36 +13,36 @@ logMessage("------------------ dns_write_post.sh ------------------");
 
 $domain = getenv('DOMAIN');
 
+$errorList = array();
+$hasErrors = false;
+
 // Retrieve DNS Records from Environment Variables
 $a = getenv('A');
 $cname = getenv('CNAME');
 $mx = getenv('MX');
+$mx_full = getenv('MX_FULL');
 $ns = getenv('NS');
 $ptr = getenv('PTR');
 $txt = getenv('TXT');
 $spf = getenv('SPF');
 $aaaa = getenv('AAAA');
 $srv = getenv('SRV');
+$aTTL = getenv('A_TIME');
+$txtTTL = getenv('TXT_TIME');
+$mxTTL = getenv('MX_TIME');
+$cnameTTL = getenv('CNAME_TIME');
+$ptrTTL = getenv('PTR_TIME');
+$nsTTL = getenv('NS_TIME');
+$aaaaTTL = getenv('AAAA_TIME');
+$srvTTL = getenv('SRV_TIME');
 
-/**
- * Unused environment variables
- * 
- * @todo Use DirectAdmin TTL values - at present this script uses the Cloudflare defaults
- */
-// $mxfull = getenv('MX_FULL');
 // $serial = getenv('SERIAL');
 // $srv_email = getenv('EMAIL');
 // $domainIP = getenv('DOMAIN_IP');
 // $serverIP = getenv('SERVER_IP');
 // $ds = getenv('DS');
-// $aTTL = getenv('A_TIME');
-// $cnameTTL = getenv('CNAME_TIME');
-// $nsTTL = getenv('NS_TIME');
-// $ptrTTL = getenv('PTR_TIME');
-// $dsTTL = getenv('DS_TIME');
-// $spfTTL = getenv('SPF_TIME');
-// $aaaaTTL = getenv('AAAA_TIME');
-// $srvTTL = getenv('SRV_TIME');
+//$dsTTL = getenv('DS_TIME');
+//$spfTTL = getenv('SPF_TIME');
 
 // Retrieve zoneID for domain from Cloudflare - if zone doesn't exist add it
 
@@ -85,8 +86,6 @@ $recordsToAdd = array();
  */
 $recordsThatExist = array();
 
-
-
 // NOTE don't parse NS records
 
 // parse A records
@@ -96,7 +95,8 @@ if (count($output) > 0) {
         $record = (object) array(
             'type' => 'A',
             'name' => qualifyRecordName($value->key),
-            'content' => $value->value
+            'content' => $value->value,
+            'ttl'   => $aTTL,
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -114,6 +114,7 @@ if (count($output) > 0) {
             'type' => 'TXT',
             'name' => qualifyRecordName($value->key),
             'content' => trim(preg_replace(array('/"\s+"/', '/"/'), array('', ''), trim($value->value, '()'))),
+            'ttl'   => $txtTTL,
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -124,14 +125,16 @@ if (count($output) > 0) {
 }
 
 // parse MX records
-$output = parseInput($mx);
+$output = parseInput($mx_full);
 if (count($output) > 0) {
     foreach ($output as $value) {
+        preg_match('/(\d+) (.*)/', $value->value, $parsedValue);
         $record = (object) array(
             'type' => 'MX',
-            'name' => $domain,
-            'content' => qualifyRecordName($value->key),
-            'priority' => $value->value
+            'name' => qualifyRecordName($value->key),
+            'priority' => $parsedValue[1],
+            'content' => qualifyRecordName($parsedValue[2]),
+            'ttl'   => $mxTTL,
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -148,7 +151,8 @@ if (count($output) > 0) {
         $record = (object) array(
             'type' => 'CNAME',
             'name' => qualifyRecordName($value->key),
-            'content' => $value->value
+            'content' => qualifyRecordName($value->value),
+            'ttl'   => $cnameTTL,
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -164,8 +168,9 @@ if (count($output) > 0) {
     foreach ($output as $value) {
         $record = (object) array(
             'type' => 'PTR',
-            'name' => qualifyRecordName($value->key),
-            'content' => $value->value
+            'name' => $value->key,
+            'content' => qualifyRecordName($value->value),
+            'ttl' => $ptrTTL,
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -182,7 +187,8 @@ if (count($output) > 0) {
         $record = (object) array(
             'type' => 'AAAA',
             'name' => qualifyRecordName($value->key),
-            'content' => $value->value
+            'content' => $value->value,
+            'ttl' => $aaaaTTL,
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -200,21 +206,23 @@ if (count($output) > 0) {
         preg_match('/(\d+) (\d+) (\d+) (.*)/', $value->value, $parsedValue);
 
         $fullSRVname = qualifyRecordName($value->key);
-        preg_match('/^(.*)\._(tcp|udp|tls)(.*)$/', $fullSRVname, $srv_match);
+        preg_match('/^(.*)\._(tcp|udp|tls)\.(.*)$/', $fullSRVname, $srv_match);
 
         $record = (object) array(
             'type' => 'SRV',
             'name' => $fullSRVname,
             'priority' => $parsedValue[1],
-            'content' => $parsedValue[4],
+            'content' => qualifyRecordName($parsedValue[4]),
             'data' => array(
+                'name'  => $srv_match[3],
                 'weight' => (int) $parsedValue[2],
                 'port' => (int) $parsedValue[3],
-                'target' => $parsedValue[4],
+                'target' => qualifyRecordName($parsedValue[4]),
                 'proto' => '_' . $srv_match[2],
                 'service' => $srv_match[1],
                 'priority' => (int) $parsedValue[1],
             ),
+            'ttl' => $srvTTL,
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -252,22 +260,44 @@ foreach ($recordsToAdd as $record) {
     $priority = isset($record->priority) ? $record->priority : '';
     $data = isset($record->data) && count($record->data) > 0 ? $record->data : [];
     $proxied = false;
-    $ttl = 0; // use default TTL
+    $ttl = $record->ttl > 0 ? $record->ttl : 0; // use default TTL
     try {
         $success = $dns->addRecord($zoneID, $record->type, $record->name, $record->content, $ttl, $proxied, $priority, $data);
-        logMessage('Add Record: ' . $record->name . "\t" . $record->type . "\t" . $record->content . "\t" . ($success == true ? 'SUCCESSFUL' : 'FAILED'));
+        logMessage('Add Record: ' . $record->name . "\t" . $record->type . "\t" . $record->content . "\t" . ($success == true ? 'SUCCESSFUL' : 'FAILED'), !$success);
     } catch (\GuzzleHttp\Exception\ClientException $e) {
-        logMessage('Add Record: ' . $record->name . "\t" . $record->type . "\t" . $record->content . "\t" . 'FAILED');
-        logMessage($e->getResponse()->getBody()->getContents());
+        logMessage('Add Record: ' . $record->name . "\t" . $record->type . "\t" . $record->content . "\t" . 'FAILED', true);
+        logMessage($e->getResponse()->getBody()->getContents(), true);
     }
+}
+
+logMessage('Result: ' . get_records_modified_text($keysToDelete) . ' deleted, ' . get_records_modified_text($recordsToAdd) . ' added.');
+
+// Output any errors to be displayed in the DirectAdmin console
+if ($hasErrors) {
+    echo join("\n\n", $errorList);
+    exit(1);
+} else {
+    exit(0);
+}
+
+function get_records_modified_text($mod_array)
+{
+    if (count($mod_array) == 1) {
+        return '1 record';
+    }
+    return count($mod_array) . ' records';
 }
 
 /**
  * Log a message to the php error log
  */
-function logMessage($message)
+function logMessage($message, $error = false)
 {
-    global $log_messages, $log_to_file, $log_filename;
+    global $log_messages, $log_to_file, $log_filename, $errorList, $hasErrors;
+    if ($error) {
+        $hasErrors = true;
+        $errorList[] = $message;
+    }
     if (!$log_messages) {
         return;
     }
@@ -289,23 +319,32 @@ function doesRecordExist($records, $record)
     }
     foreach ($records as $compare) {
         if ($record->type == 'SRV') {
+            if (!isset($compare->data)) {
+                continue;
+            }
             $compare_data = (object) $compare->data;
             $record_data = (object) $record->data;
             if (
-                $compare->type == $record->type &&
-                $compare->name == $record->name &&
-                $compare_data->weight == $record_data->weight &&
-                $compare_data->target == $record_data->target &&
-                $compare_data->proto == $record_data->proto &&
-                $compare_data->service == $record_data->service &&
-                $compare_data->priority == $record_data->priority &&
-                $compare_data->port == $record_data->port
+                compare_records($compare->type, $record->type) &&
+                compare_records($compare->name, $record->name) &&
+                compare_records($compare->ttl, $record->ttl) &&
+                compare_records($compare_data->weight, $record_data->weight) &&
+                compare_records($compare_data->target, $record_data->target) &&
+                compare_records($compare_data->proto, $record_data->proto) &&
+                compare_records($compare_data->service, $record_data->service) &&
+                compare_records($compare_data->priority, $record_data->priority) &&
+                compare_records($compare_data->port, $record_data->port)
             ) {
                 return true;
             }
         } else {
-            if ($compare->type == $record->type && $compare->name == $record->name && $compare->content == $record->content) {
-                if ($record->type == 'MX' && $compare->priority != $record->priority) {
+            if (
+                compare_records($compare->type, $record->type) &&
+                compare_records($compare->name, $record->name) &&
+                compare_records($compare->content, $record->content) &&
+                compare_records($compare->ttl, $record->ttl)
+            ) {
+                if ($record->type == 'MX' && !compare_records($compare->priority, $record->priority)) {
                     continue;
                 }
                 return true;
@@ -313,6 +352,16 @@ function doesRecordExist($records, $record)
         }
     }
     return false;
+}
+
+/**
+ * Compare two records to see if they match
+ * @param string $r1 Existing Record on Cloudflare
+ * @param string $r2 Record on server
+ */
+function compare_records($r1, $r2)
+{
+    return $r1 == $r2;
 }
 
 /**

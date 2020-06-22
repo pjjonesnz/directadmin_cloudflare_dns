@@ -1,9 +1,18 @@
 #!/usr/local/bin/php
 <?php
+/**
+ * DirectAdmin DNS to Cloudflare sync
+ * 
+ * Script to synchronize DirectAdmin DNS settings with your Cloudflare hosted ns
+ * 
+ * @author Paul Jones (info@beyondthebox.co.nz)
+ * @version 1.1.6
+ * @license MIT
+ * @link https://github.com/pjjonesnz/directadmin_cloudflare_dns
+ * 
+ */
 
 /**
- * Script to synchronize DNS changes in DirectAdmin with a single CloudFare account
- * 
  * Add your email address and CloudFare API Key below
  */
 $cloudflare_email = '';

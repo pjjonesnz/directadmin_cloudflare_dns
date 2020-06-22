@@ -78,5 +78,5 @@ I use this script in a production environment hosting multiple domains. It was i
 <h3>Notes:</h3>
 <ul>
   <li>The script is written in PHP and may need the first line changed to point to your PHP installation if your server has a different setup.</li>
-  <li>The TTL for your DNS records is not syncronized across to Cloudflare, they will instead use the Cloudflare defaults for TTL.</li>
+  <li>The default TTL settings for your DirectAdmin records are synchronized across to Cloudflare. Note that individual TTL record settings are not supported by DirectAdmin for dns_write_post scripts.</li>
 </ul>
