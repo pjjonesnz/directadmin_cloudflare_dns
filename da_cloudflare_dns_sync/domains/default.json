@@ -1,0 +1,11 @@
+{
+    "proxy_default": false,
+    "proxy_record": {
+        "A": {
+        },
+        "CNAME": {
+        },
+        "AAAA": {
+        }
+    }
+}

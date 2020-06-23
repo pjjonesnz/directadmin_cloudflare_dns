@@ -1,82 +1,90 @@
 # DirectAdmin to Cloudflare DNS sync
-Script to sync DirectAdmin dns changes with your Cloudflare account
 
-Cloudflare has a free domain nameserver service which is super fast. It is a great way to move nameserver hosting off your web server and on to a managed platform.
+Script to sync DirectAdmin dns changes *from* DirectAdmin *to* your Cloudflare account
+
+
+* **Keep your Cloudflare dns records in sync with your server** without having to log in to Cloudflare and manually change them
+* **Automatically add new domains** to your Cloudflare account when they are added to your server
+* **Set proxy on/off** using a config file **for the entire domain or for individual records**
+* Set proxy on/off for all of your domains, using a **default settings file**
+
+Cloudflare has a free dns service which is super fast. It is a great way to move nameserver hosting off your web server and on to a managed platform. And if you want to go even faster, enable their proxy!
 
 This handy script for DirectAdmin syncs the DNS records for your domains FROM DirectAdmin TO your Cloudflare account. Use this script when using Cloudflare as the nameserver host for your domain. 
 
-I use this script in a production environment hosting multiple domains. It was installed on my server just after installing a fresh copy of DirectAdmin. I obviously can't make any guarantees to its suitability for your server if you have a customized DirectAdmin setup, so please test it once installed.
+I use this script in a production environment hosting multiple domains.
 
-<h2>Installation (with helpful examples)</h2>
+## Installation
 
-<ol>
-  <li>SSH into your server (as admin)</li>
-  <li>Download the repository to a folder on your server (example as follows)
-    <ul>
-      <li>cd /home/admin</li>
-      <li>git clone https://github.com/pjjonesnz/directadmin_cloudflare_dns.git</li>
-    </ul>
-  </li>
-  <li>Install the required composer packages
-    <ul>
-      <li>cd directadmin_cloudflare_dns/da_cloudflare_dns_sync</li>
-      <li>Install Composer Dependency Manager for PHP if not already installed on your system (see: https://getcomposer.org/)</li>
-      <li>run 'php composer.phar install' (or possibly 'composer install' if you have composer set up already)</li>
-    </ul>
-  </li>
-  <li>At this point the composer dependencies will be downloaded into the vendor subfolder by composer and everything is ready to move into place in the DirectAdmin custom scripts folder</li>
-  <li>Copy all the files in the main folder you created, including all subfolders, to /usr/local/directadmin/scripts/custom
-    <ul>
-        <li>Using the example folder structure given above, run the following</li>
-        <li>sudo cp -r /home/admin/directadmin_cloudflare_dns/* /usr/local/directadmin/scripts/custom/</li>
-    </ul>
-  </li>
-</ol>
+[Full Installation Instructions Here](./INSTALL.md)
 
-<h2>Cloudflare setup</h2>
+## Usage
 
-<ol>
-  <li>Create a Cloudflare account if you haven't done so already at cloudflare.com</li>
-  <li>Login to your Cloudflare account</li>
-  <li>If you haven't used Cloudflare before, you will need to add one of your domains to Cloudflare to see the custom nameservers that have been assigned to your account. You're welcome to get a pro plan, but the free plan also works for this step.</li>
-  <li>Once you have added your domain, you'll see the two nameservers that have been assigned to you in the format name.ns.cloudflare.com - make note of these for the DirectAdmin setup below</li>
-  <li>Click on your profile icon at the top right of the website</li>
-  <li>Click on 'My Profile'</li>
-  <li>Select the 'API Tokens' tab</li>
-  <li>Under the API Keys section, click on 'View' next to 'Global API Key'</li>
-  <li>Type your password to view your API Key - make a safe note of this for the script setup below</li>
- </ol>
- 
- <h2>Script setup</h2>
- 
- <ol>
-  <li>Edit the dns_write_post.sh file to add your email and API Key</li>
-  <li>sudo vim /usr/local/directadmin/scripts/custom/dns_write_post.sh</li>
-  <li>Edit the script to add your Cloudflare registered email address: eg. $cloudflare_email = 'email@domain.com';</li>
-  <li>Edit the script to add your Cloudflare API Key: eg. $cloudflare_api_key='1234567890';</li>
-  <li>Save the script and exit the editor</li>
-  <li>Give dns_write_post.sh executable permissions: chmod 755 /usr/local/directadmin/scripts/custom/dns_write_post.sh</li>
-  <li>Run the following command to verify the connection to Cloudflare
-    <ul>
-      <li>/usr/local/directadmin/scripts/custom/dns_write_post.sh verify</li>
-      <li>You should see the following message, "Your user ID is: ......", with your user ID listed.</li>
-    </ul>
-  </li>
-  <li>If so, CONGRATULATIONS, the script is installed and communicating with your Cloudflare account</li>
- </ol>
- 
- <h2>DirectAdmin setup</h2>
- <ol>
-  <li>Login to your DirectAdmin reseller or admin account</li>
-  <li>Edit the DNS record for one of your websites. Change the nameserver records for the domain to your two new Cloudflare nameservers</li>
-  <li>Have a look at the DNS record on your Cloudflare account - if it is a different domain than you have previously added to your Cloudflare account, you will see that it has now been added, and any differences in the DNS record have been synchronized.</li>
-  <li>Obviously if you are moving to Cloudflare's DNS hosting, you will need to update the nameserver records at your domain registrar.</li>
-  </ol>
-  
-  <strong>That's it!</strong>
-<hr />
-<h3>Notes:</h3>
-<ul>
-  <li>The script is written in PHP and may need the first line changed to point to your PHP installation if your server has a different setup.</li>
-  <li>The TTL settings for your records are managed by Cloudflare by default. If you want to write the DirectAdmin defaults across to CloudFlare, set the $use_da_ttl variable to true. Note that custom TTL for individual records are not supported by DirectAdmin using dns_write_post scripts. Instead you can set the TTL for record types in the DirectAdmin named settings. See this document: https://www.directadmin.com/features.php?id=2084</li>
-</ul>
+1. create/modify your domain in DirectAdmin
+2. set your DirectAdmin domain's NS records to customname.ns.cloudflare.com AND customname2.ns.cloudflare.com (where customname/customname2 are the ns record names assigned to you by Cloudflare.
+3. Check your Cloudflare account and see the domain settings automatically synchronized with your server's settings.
+
+**NOTE:** If you have already added your domain to Cloudflare and have changed your DNS settings manually there, and they are different from your server, your server will overwrite any settings on Cloudflare and delete any settings that don't exist on your server. The synchronization is one way, *from* your server *to* Cloudflare.
+
+## Customize your proxy settings
+
+Proxy configuration is found in this folder: /usr/local/directadmin/scripts/custom/da_cloudflare_dns_sync/domains
+
+### Proxy defaults
+
+The default settings for your server can be made in: 'default.json'
+
+| Setting | Description | Default |
+|---|---|---|
+| ```proxy_default``` | the default proxy setting for all valid records (A, CNAME and AAAA) | false |
+| ```proxy_record``` | an array of records to set individual settings per record | |
+
+Example to enable Cloudflare proxy on ALL DOMAINS, but disable it for ftp and mail A records:
+
+```js
+{
+    "proxy_default": true,
+    "proxy_record": {
+        "A": {
+          "mail": false,
+          "ftp": false,
+        },
+        "CNAME": {
+        },
+        "AAAA": {
+        }
+    }
+}
+```
+
+###  Settings for individual domains
+
+The proxy settings can also be enabled/disabled for particular domains
+
+* Copy the default.json file to **my_full_domain_name**.json (eg. ```cp default.json mydomainname.com.json```)
+* Change the settings in the newly create file for your domain as required
+
+Example to enable proxy on your domain record and www but disable it on everything else:
+
+```js
+// Example domain name: mydomainname.com
+// Filename: mydomainname.com.json
+
+{
+    "proxy_default": false,
+    "proxy_record": {
+        "A": { // Add A records here
+          "mydomainname.com.": true,
+          "www": true,
+        },
+        "CNAME": { // Add CNAME records here
+        },
+        "AAAA": { // Add AAAA records here
+        }
+    }
+}
+```
+
+To cause your domain to update after changing any settings, edit one of the domain records and save your setting (even making it equal to the same setting as it was before will force an update of any changed records).
+
+I hope this script is helpful to you. PLEASE let me know if you have any troubles by creating an issue in Github.

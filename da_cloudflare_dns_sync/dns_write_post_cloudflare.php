@@ -76,6 +76,31 @@ try {
 logMessage('Zone ID for ' . $domain . ' - ' . $zoneID);
 
 /**
+ * Load settings json for domain, or defaults if custom domain settings not available
+ */
+$domain_settings = array('proxy_default' => false);
+$settings_filename = __DIR__ . '/domains/' . $domain . '.json';
+
+if (!file_exists($settings_filename)) {
+    $settings_filename = __DIR__ . '/domains/default.json';
+    if (!file_exists($settings_filename)) {
+        logMessage('Error: default domain config file default.json missing from plugin.', true);
+        $settings_filename = '';
+    }
+}
+if ($settings_filename !== '') {
+    $json_file = file_get_contents($settings_filename);
+    if ($json_file !== false) {
+        $load_settings = json_decode($json_file, true);
+        if ($load_settings !== NULL) {
+            $domain_settings = $load_settings;
+        } else {
+            logMessage('Error: Json error in default.json plugin config file.', true);
+        }
+    }
+}
+
+/**
  * Load existing DNS records for the domain
  */
 $dns = new \Cloudflare\API\Endpoints\DNS($adapter);
@@ -85,9 +110,9 @@ $existingRecords = array();
 
 do {
     $page++;
-    $listRecords = $dns->listRecords($zoneID,'','','',$page,$per_page);
+    $listRecords = $dns->listRecords($zoneID, '', '', '', $page, $per_page);
     $existingRecords = array_merge($existingRecords, $listRecords->result);
-} while($listRecords->result_info->total_pages > $page);
+} while ($listRecords->result_info->total_pages > $page);
 
 /**
  * Array of dns records to add to Cloudflare
@@ -106,10 +131,11 @@ $output = parseInput($a);
 if (count($output) > 0) {
     foreach ($output as $value) {
         $record = (object) array(
-            'type' => 'A',
-            'name' => qualifyRecordName($value->key),
-            'content' => $value->value,
-            'ttl'   => $aTTL,
+            'type'      => 'A',
+            'name'      => qualifyRecordName($value->key),
+            'content'   => $value->value,
+            'ttl'       => $aTTL,
+            'proxied'   => is_proxied('A', $value->key),
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -124,10 +150,11 @@ $output = parseInput($txt);
 if (count($output) > 0) {
     foreach ($output as $value) {
         $record = (object) array(
-            'type' => 'TXT',
-            'name' => qualifyRecordName($value->key),
-            'content' => trim(preg_replace(array('/"\s+"/', '/"/'), array('', ''), trim($value->value, '()'))),
-            'ttl'   => $txtTTL,
+            'type'      => 'TXT',
+            'name'      => qualifyRecordName($value->key),
+            'content'   => trim(preg_replace(array('/"\s+"/', '/"/'), array('', ''), trim($value->value, '()'))),
+            'ttl'       => $txtTTL,
+            'proxied'   => false
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -143,11 +170,12 @@ if (count($output) > 0) {
     foreach ($output as $value) {
         preg_match('/(\d+) (.*)/', $value->value, $parsedValue);
         $record = (object) array(
-            'type' => 'MX',
-            'name' => qualifyRecordName($value->key),
-            'priority' => $parsedValue[1],
-            'content' => qualifyRecordName($parsedValue[2]),
-            'ttl'   => $mxTTL,
+            'type'      => 'MX',
+            'name'      => qualifyRecordName($value->key),
+            'priority'  => $parsedValue[1],
+            'content'   => qualifyRecordName($parsedValue[2]),
+            'ttl'       => $mxTTL,
+            'proxied'   => false,
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -162,10 +190,11 @@ $output = parseInput($cname);
 if (count($output) > 0) {
     foreach ($output as $value) {
         $record = (object) array(
-            'type' => 'CNAME',
-            'name' => qualifyRecordName($value->key),
-            'content' => qualifyRecordName($value->value),
-            'ttl'   => $cnameTTL,
+            'type'      => 'CNAME',
+            'name'      => qualifyRecordName($value->key),
+            'content'   => qualifyRecordName($value->value),
+            'ttl'       => $cnameTTL,
+            'proxied'   => is_proxied('CNAME', $value->key),
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -180,10 +209,11 @@ $output = parseInput($ptr);
 if (count($output) > 0) {
     foreach ($output as $value) {
         $record = (object) array(
-            'type' => 'PTR',
-            'name' => $value->key,
-            'content' => qualifyRecordName($value->value),
-            'ttl' => $ptrTTL,
+            'type'      => 'PTR',
+            'name'      => $value->key,
+            'content'   => qualifyRecordName($value->value),
+            'ttl'       => $ptrTTL,
+            'proxied'   => false,
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -198,10 +228,11 @@ $output = parseInput($aaaa);
 if (count($output) > 0) {
     foreach ($output as $value) {
         $record = (object) array(
-            'type' => 'AAAA',
-            'name' => qualifyRecordName($value->key),
-            'content' => $value->value,
-            'ttl' => $aaaaTTL,
+            'type'      => 'AAAA',
+            'name'      => qualifyRecordName($value->key),
+            'content'   => $value->value,
+            'ttl'       => $aaaaTTL,
+            'proxied'   => is_proxied('AAAA', $value->key),
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -222,20 +253,21 @@ if (count($output) > 0) {
         preg_match('/^(.*)\._(tcp|udp|tls)\.(.*)$/', $fullSRVname, $srv_match);
 
         $record = (object) array(
-            'type' => 'SRV',
-            'name' => $fullSRVname,
-            'priority' => $parsedValue[1],
-            'content' => qualifyRecordName($parsedValue[4]),
-            'data' => array(
-                'name'  => $srv_match[3],
-                'weight' => (int) $parsedValue[2],
-                'port' => (int) $parsedValue[3],
-                'target' => qualifyRecordName($parsedValue[4]),
-                'proto' => '_' . $srv_match[2],
-                'service' => $srv_match[1],
-                'priority' => (int) $parsedValue[1],
+            'type'      => 'SRV',
+            'name'      => $fullSRVname,
+            'priority'  => $parsedValue[1],
+            'content'   => qualifyRecordName($parsedValue[4]),
+            'data'      => array(
+                'name'      => $srv_match[3],
+                'weight'    => (int) $parsedValue[2],
+                'port'      => (int) $parsedValue[3],
+                'target'    => qualifyRecordName($parsedValue[4]),
+                'proto'     => '_' . $srv_match[2],
+                'service'   => $srv_match[1],
+                'priority'  => (int) $parsedValue[1],
             ),
-            'ttl' => $srvTTL,
+            'ttl'       => $srvTTL,
+            'proxied'   => false,
         );
         if (doesRecordExist($existingRecords, $record) === false) {
             $recordsToAdd[] = $record;
@@ -272,11 +304,11 @@ if (count($keysToDelete) > 0) {
 foreach ($recordsToAdd as $record) {
     $priority = isset($record->priority) ? $record->priority : '';
     $data = isset($record->data) && count($record->data) > 0 ? $record->data : [];
-    $proxied = false;
+    $proxied = $record->proxied;
     $ttl = $record->ttl > 0 ? $record->ttl : 0; // use default TTL
     try {
         $success = $dns->addRecord($zoneID, $record->type, $record->name, $record->content, $ttl, $proxied, $priority, $data);
-        logMessage('Add Record: ' . $record->name . "\t" . $record->type . "\t" . $record->content . "\t" . ($success == true ? 'SUCCESSFUL' : 'FAILED'), !$success);
+        logMessage('Add Record: ' . $record->name . "\t" . $record->type . "\t" . $record->content . "\t" . ($success == true ? 'SUCCESSFUL' : 'FAILED') . "\t" . "Proxy: " . ($proxied ? 'on' : 'off'), !$success);
     } catch (\GuzzleHttp\Exception\ClientException $e) {
         logMessage('Add Record: ' . $record->name . "\t" . $record->type . "\t" . $record->content . "\t" . 'FAILED', true);
         logMessage($e->getResponse()->getBody()->getContents(), true);
@@ -291,6 +323,18 @@ if ($hasErrors) {
     exit(1);
 } else {
     exit(0);
+}
+
+function is_proxied($record_type, $record_name)
+{
+    global $domain_settings;
+    if($record_name == 'localhost') {
+        return false;
+    }
+    if (isset($domain_settings['proxy_record']) && isset($domain_settings['proxy_record'][$record_type]) && isset($domain_settings['proxy_record'][$record_type][$record_name])) {
+        return $domain_settings['proxy_record'][$record_type][$record_name] === true;
+    }
+    return isset($domain_settings['proxy_default']) && $domain_settings['proxy_default'] === true;
 }
 
 function get_records_modified_text($mod_array)
@@ -341,6 +385,7 @@ function doesRecordExist($records, $record)
             if (
                 compare_records($compare->type, $record->type) &&
                 compare_records($compare->name, $record->name) &&
+                compare_records($compare->proxied, $record->proxied) &&
                 (!$use_da_ttl || compare_records($compare->ttl, $record->ttl)) &&
                 compare_records($compare_data->weight, $record_data->weight) &&
                 compare_records($compare_data->target, $record_data->target) &&
@@ -356,6 +401,7 @@ function doesRecordExist($records, $record)
                 compare_records($compare->type, $record->type) &&
                 compare_records($compare->name, $record->name) &&
                 compare_records($compare->content, $record->content) &&
+                compare_records($compare->proxied, $record->proxied) &&
                 (!$use_da_ttl || compare_records($compare->ttl, $record->ttl))
             ) {
                 if ($record->type == 'MX' && !compare_records($compare->priority, $record->priority)) {
