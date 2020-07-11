@@ -47,7 +47,7 @@ Example to enable Cloudflare proxy on ALL DOMAINS, but disable it for ftp and ma
     "proxy_record": {
         "A": {
           "mail": false,
-          "ftp": false,
+          "ftp": false
         },
         "CNAME": {
         },
@@ -75,7 +75,7 @@ Example to enable proxy on your domain record and www but disable it on everythi
     "proxy_record": {
         "A": { // Add A records here
           "mydomainname.com.": true,
-          "www": true,
+          "www": true
         },
         "CNAME": { // Add CNAME records here
         },
@@ -84,6 +84,11 @@ Example to enable proxy on your domain record and www but disable it on everythi
     }
 }
 ```
+
+Note: comments in the above example most be removed
+as comments are not valid json. To test your json
+config file, use [JSONLint](https://jsonlint.com/).
+Be careful that you don't have any trailing commas in your json file.
 
 To cause your domain to update after changing any settings, edit one of the domain records and save your setting (even making it equal to the same setting as it was before will force an update of any changed records).
 
