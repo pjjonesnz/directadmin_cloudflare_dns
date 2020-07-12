@@ -37,7 +37,7 @@ The default settings for your server can be made in: 'default.json'
 | Setting | Description | Default |
 |---|---|---|
 | ```proxy_default``` | the default proxy setting for all valid records (A, CNAME and AAAA) | false |
-| ```proxy_record``` | an array of records to set individual settings per record | |
+| ```proxy_record``` | an object that contains individual settings by record type and name | |
 
 Example to enable Cloudflare proxy on ALL DOMAINS, but disable it for ftp and mail A records:
 
