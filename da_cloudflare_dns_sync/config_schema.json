@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "proxy_default": {
+            "type": "boolean"
+        },
+        "proxy_record": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "A": {
+                    "type": "object",
+                    "propertyNames": {
+                        "type": "string"
+                    },
+                    "patternProperties": {
+                        ".*": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "CNAME": {
+                    "type": "object",
+                    "propertyNames": {
+                        "type": "string"
+                    },
+                    "patternProperties": {
+                        ".*": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "AAAA": {
+                    "type": "object",
+                    "propertyNames": {
+                        "type": "string"
+                    },
+                    "patternProperties": {
+                        ".*": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "required": ["proxy_default"],
+    "additionalProperties": false
+}

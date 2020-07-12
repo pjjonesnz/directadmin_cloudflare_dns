@@ -6,7 +6,7 @@
  * Script to synchronize DirectAdmin DNS settings with your Cloudflare hosted ns
  * 
  * @author Paul Jones (info@beyondthebox.co.nz)
- * @version 1.2.0
+ * @version 1.3.0
  * @license MIT
  * @link https://github.com/pjjonesnz/directadmin_cloudflare_dns
  * 
@@ -34,6 +34,10 @@ $log_filename = '/tmp/cloudflare_dns_messages.log';
 
 if(in_array('verify', $argv)) {
     require('da_cloudflare_dns_sync/verify_connection.php');
+    exit;
+}
+else if(in_array('test_config', $argv)) {
+    require('da_cloudflare_dns_sync/verify_domain_config.php');
     exit;
 }
 

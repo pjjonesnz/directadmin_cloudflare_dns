@@ -79,8 +79,8 @@ But, if you want to see exactly what the script is doing you can enable and view
 * Edit the usr/local/directadmin/scripts/custom/dns_write_post.sh file
 * Set: ```$log_messages = true```
 * Save the file
-* Watch the output in the logfile. eg. ```tail -f /tmp/cloudflare_dns_messages.log```
-* Edit your domain in DirectAdmin and watch the logfile output
+* Watch the output in the log file. eg. ```tail -f /tmp/cloudflare_dns_messages.log```
+* Edit your domain in DirectAdmin and watch the log file output
 * Remember to set: ```$log_messages = false``` when you have finished watching
 
 <hr />

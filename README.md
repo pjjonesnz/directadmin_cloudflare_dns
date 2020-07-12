@@ -57,7 +57,17 @@ Example to enable Cloudflare proxy on ALL DOMAINS, but disable it for ftp and ma
 }
 ```
 
-###  Settings for individual domains
+## Testing your config files
+
+All config files in the domains folder can be tested by running the following command ```/usr/local/directadmin/scripts/custom/dns_write_post.sh test_config```
+
+Any errors while decoding the json file will be displayed.  Any errors in the config options will also be displayed along with the json node tree that contains the error. If you have trouble finding what is causing the error feel free to open an issue.
+
+You can also test that your JSON file format is correct at [JSONLint](https://jsonlint.com/) - although this doesn't check that the config properties are correct. 
+
+Note: Be careful that you don't have any trailing commas in your json file. Remember that json isn't the same as javascript object literal syntax.
+
+## Settings for individual domains
 
 The proxy settings can also be enabled/disabled for particular domains
 
@@ -85,7 +95,7 @@ Example to enable proxy on your domain record and www but disable it on everythi
 }
 ```
 
-Note: comments in the above example must be removed as comments are not valid json. To test your json config file, use [JSONLint](https://jsonlint.com/). Be careful that you don't have any trailing commas in your json file.
+**Please note:** comments in the above example must be removed as comments are not valid json.
 
 To cause your domain to update after changing any settings, edit one of the domain records and save your setting (even making it equal to the same setting as it was before will force an update of any changed records).
 

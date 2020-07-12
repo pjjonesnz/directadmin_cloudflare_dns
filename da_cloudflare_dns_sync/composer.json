@@ -1,6 +1,7 @@
 {
     "require": {
-        "cloudflare/sdk": "dev-pjjonesnz-fix-mx-priority-0"
+        "cloudflare/sdk": "dev-pjjonesnz-fix-mx-priority-0",
+        "opis/json-schema": "^1.0"
     },
     "repositories": [
         {
