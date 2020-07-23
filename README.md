@@ -97,6 +97,6 @@ Example to enable proxy on your domain record and www but disable it on everythi
 
 **Please note:** comments in the above example must be removed as comments are not valid json.
 
-To cause your domain to update after changing any settings, edit one of the domain records and save your setting (even making it equal to the same setting as it was before will force an update of any changed records).
+To cause your domain to update after changing any settings, edit one of the domain records and save your settings (even making it equal to the same settings as it was before will force an update of any changed records).
 
 I hope this script is helpful to you. PLEASE let me know if you have any troubles by creating an issue in Github.
