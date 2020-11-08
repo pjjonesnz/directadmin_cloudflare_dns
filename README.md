@@ -94,8 +94,30 @@ Example to enable proxy on your domain record and www but disable it on everythi
     }
 }
 ```
-
 **Please note:** comments in the above example must be removed as comments are not valid json.
+
+## Setting proxy on/off for entire record type
+
+You can set the record type in the following two ways:
+
+1. to an object (as per the example above), with a list of records you want to enable (or disable) the proxy for.
+2. to a boolean, to set all records of that type to be proxied (or not). eg.
+
+```js
+{
+    "proxy_default": false,
+    "proxy_record": {
+        "A": true,
+        "CNAME": {
+          "my.record": true,
+        },
+        "AAAA": {
+        }
+    }
+}
+```
+
+
 
 To cause your domain to update after changing any settings, edit one of the domain records and save your settings (even making it equal to the same settings as it was before will force an update of any changed records).
 

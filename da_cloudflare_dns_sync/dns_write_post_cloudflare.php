@@ -331,9 +331,16 @@ function is_proxied($record_type, $record_name)
     if($record_name == 'localhost') {
         return false;
     }
-    if (isset($domain_settings['proxy_record']) && isset($domain_settings['proxy_record'][$record_type]) && isset($domain_settings['proxy_record'][$record_type][$record_name])) {
-        return $domain_settings['proxy_record'][$record_type][$record_name] === true;
-    }
+    if (isset($domain_settings['proxy_record']) && isset($domain_settings['proxy_record'][$record_type])) {
+        if(is_array($domain_settings['proxy_record'][$record_type])) {
+            if(isset($domain_settings['proxy_record'][$record_type][$record_name])) {
+                return $domain_settings['proxy_record'][$record_type][$record_name] === true;
+            }
+        }
+        elseif(is_bool($domain_settings['proxy_record'][$record_type]) ) {
+            return $domain_settings['proxy_record'][$record_type] === true;
+        }
+    } 
     return isset($domain_settings['proxy_default']) && $domain_settings['proxy_default'] === true;
 }
 

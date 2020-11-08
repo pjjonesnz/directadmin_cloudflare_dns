@@ -10,7 +10,7 @@
             "additionalProperties": false,
             "properties": {
                 "A": {
-                    "type": "object",
+                    "type": ["object","boolean"],
                     "propertyNames": {
                         "type": "string"
                     },
@@ -21,7 +21,7 @@
                     }
                 },
                 "CNAME": {
-                    "type": "object",
+                    "type": ["object","boolean"],
                     "propertyNames": {
                         "type": "string"
                     },
@@ -32,7 +32,7 @@
                     }
                 },
                 "AAAA": {
-                    "type": "object",
+                    "type": ["object","boolean"],
                     "propertyNames": {
                         "type": "string"
                     },
