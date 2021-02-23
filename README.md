@@ -1,5 +1,7 @@
 # DirectAdmin to Cloudflare DNS sync
 
+**PLEASE NOTE:** This script is now deprecated.  For our replace DirectAdmin Plugin, daflare, see: https://daflare.com/
+
 Script to sync DirectAdmin dns changes *from* DirectAdmin *to* your Cloudflare account
 
 
