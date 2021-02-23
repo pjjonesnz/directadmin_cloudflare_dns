@@ -1,6 +1,6 @@
-# DirectAdmin to Cloudflare DNS sync
+# Feb 2021 Update - daflare plugin released
 
-**PLEASE NOTE:** This script is now deprecated.  For my replacement DirectAdmin Plugin, daflare, see: https://daflare.com/
+**PLEASE NOTE:** This script is now deprecated.  For my replacement DirectAdmin Plugin, daflare, see: https://daflare.com
 
 The benefits of moving to daflare are:
 
@@ -10,6 +10,10 @@ The benefits of moving to daflare are:
 * Share a single Cloudflare account with all the user accounts you manage
 
 [Visit daflare.com](https://daflare.com) for all the details and to download
+
+---
+
+# DEPRECATED: DirectAdmin to Cloudflare DNS Sync
 
 ## Deprecated script instructions
 
